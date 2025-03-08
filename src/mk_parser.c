@@ -16,7 +16,7 @@ int MkParser(const char *arg, MkTarget_p targets)
     int targetsSize = 10;
     targets = (MkTarget_p)malloc(sizeof(MkTarget_t) * targetsSize);
     int targetNum = 0;
-    LogDebug("mk_parser");
+    LogDebug("MkParser");
     LogDebug("Parsing %s", arg);
     // 检查cwd下是否存在Makefile文件
     FILE *fp = fopen("Makefile", "r");
