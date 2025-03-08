@@ -48,7 +48,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 static struct argp argp = {
     options,
     parse_opt,
-    "INPUT...",
+    "[TARGET]...",
     "A minimake tool like make",
     0, 0, 0};
 
