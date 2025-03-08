@@ -8,6 +8,7 @@
 
 #include <argp.h>
 #include <stdlib.h>
+#include "loger.h"
 
 static struct argp_option options[] = {
     {"verbose", 'v', 0, 0, "Enable verbose mode", 0},
@@ -21,12 +22,15 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     {
     case 'v':
         printf("verbose mode enabled\n");
+        logger_config.level = LOG_DEBUG; // 启用 DEBUG 级别日志
+        log_debug("Verbose mode activated");
         break;
     case 'V':
         printf("Version 0.1\n");
         break;
     case ARGP_KEY_ARG:
-        printf("ARG %s\n", arg);
+        log_debug("Argument: %s", arg);
+
         break;
     case ARGP_KEY_END:
         if (state->arg_num < 1)
