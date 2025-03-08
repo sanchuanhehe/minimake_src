@@ -22,7 +22,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     switch (key)
     {
     case 'v':
-        printf("verbose mode enabled\n");
+        log_info("verbose mode enabled");
         logger_config.level = LOG_DEBUG; // 启用 DEBUG 级别日志
         log_debug("Verbose mode activated");
         break;
