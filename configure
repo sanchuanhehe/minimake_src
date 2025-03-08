@@ -4,6 +4,6 @@ echo "Configuring the system..."
 
 echo "Updating the system..."
 sudo apt-get update
-sudo apt-get upgrade
+# sudo apt-get upgrade
 
 echo "Finished"
