@@ -11,7 +11,7 @@ void log_message(log_level_t level, const char *file, int line, const char *fmt,
     // 获取时间戳
     time_t now = time(NULL);
     struct tm *tm_info = localtime(&now);
-    char timestamp;
+    char timestamp[64] = {0};  // 修改为字符数组并初始化
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
 
     // 颜色定义
