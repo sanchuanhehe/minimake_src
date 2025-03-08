@@ -1,7 +1,8 @@
 #include "loger.h"
 #include <stdio.h>
-
-
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 /**
  * @brief 解析Makefile文件
@@ -39,7 +40,6 @@ int mk_parser(const char *arg)
     // 逐行读取文件
     while (fgets(line, sizeof(line), fp) != NULL) {
         line_num++;
-        char *p = line;
         int len;
         
         // 去除注释
@@ -81,7 +81,7 @@ int mk_parser(const char *arg)
         
 
         // 输出处理后的行
-        log_debug("Processed line: %s", line);
+        // log_debug("Processed line: %s", line);
         if (verbose_mode && out_fp != NULL) {
             fprintf(out_fp, "%s\n", line);
         }
