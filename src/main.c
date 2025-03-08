@@ -1,15 +1,52 @@
 /**
  * @file main.c
- * @brief Main file for the project
+ * @brief A minimake tool like make
  * @date 2024-03-08
  * @author sanchuanheh
  * @version 0.1
  */
 
-#include <stdio.h>
+#include <argp.h>
+#include <stdlib.h>
 
-int main(int argc, char *argv[])
+static struct argp_option options[] = {
+    {"verbose", 'v', 0, 0, "Enable verbose mode", 0},
+    {"ersion", 'V', 0, 0, "Show version", 0},
+    {0}};
+
+static error_t parse_opt(int key, char *arg, struct argp_state *state)
 {
+    // 实际参数处理逻辑
+    switch (key)
+    {
+    case 'v':
+        printf("verbose mode enabled\n");
+        break;
+    case 'V':
+        printf("Version 0.1\n");
+        break;
+    case ARGP_KEY_ARG:
+        printf("ARG %s\n", arg);
+        break;
+    case ARGP_KEY_END:
+        if (state->arg_num < 1)
+            argp_usage(state);
+        break;
+    default:
+        return ARGP_ERR_UNKNOWN;
+    }
+    return 0;
+}
 
+static struct argp argp = {
+    options,
+    parse_opt,
+    "INPUT...",
+    "A minimake tool like make",
+    0, 0, 0};
+
+int main(int argc, char **argv)
+{
+    argp_parse(&argp, argc, argv, 0, 0, 0);
     return 0;
 }
