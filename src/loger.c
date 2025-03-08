@@ -3,6 +3,9 @@
 #include <stdarg.h>
 #include "loger.h"
 
+// 全局日志配置
+struct logger_config_t logger_config = {LOG_INFO, 1}; // 默认级别为 INFO，启用颜色
+
 void log_message(log_level_t level, const char *file, int line, const char *fmt, ...)
 {
     if (level > logger_config.level)

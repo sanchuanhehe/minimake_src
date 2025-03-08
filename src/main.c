@@ -30,9 +30,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         printf("Version 0.1\n");
         break;
     case ARGP_KEY_ARG:
+        log_info("Argument: %s", arg);
         log_debug("Argument: %s", arg);
-        int err = mk_parser(arg);
-        log_debug("err: %d", err);
+        // int err = mk_parser(arg);
+        // log_debug("err: %d", err);
         break;
     case ARGP_KEY_END:
         if (state->arg_num < 1)
