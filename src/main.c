@@ -9,6 +9,7 @@
 #include <argp.h>
 #include <stdlib.h>
 #include "loger.h"
+#include "mk_parser.h"
 
 static struct argp_option options[] = {
     {"verbose", 'v', 0, 0, "Enable verbose mode", 0},
@@ -30,7 +31,8 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
         break;
     case ARGP_KEY_ARG:
         log_debug("Argument: %s", arg);
-
+        int err = mk_parser(arg);
+        log_debug("err: %d", err);
         break;
     case ARGP_KEY_END:
         if (state->arg_num < 1)
