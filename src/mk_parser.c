@@ -60,8 +60,9 @@ int mk_parser(const char *arg)
         }
 
         // 进行静态语法检查
-        // 如果行首是不是空格或者制表符，那么这一行是一个新的规则
-        if (!isspace(*p)) {
+        // 如果行首是不是制表符，那么这一行是一个新的规则
+        if (line[0] != '\t')
+        {
             log_debug("Rule: %s", line);
             // 这一行是一个新的规则, 必须有冒号
             char *colon = strchr(line, ':');
