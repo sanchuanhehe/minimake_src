@@ -77,11 +77,6 @@ int mk_parser(const char *arg)
                 log_error("Line1: Command found before rule");
                 exit(1);
             }
-            // 如果行首不是4个空格,报错
-            if (line[0] != ' ' || line[1] != ' ' || line[2] != ' ' || line[3] != ' ') {
-                log_error("Line:%d: Command must be indented with 4 spaces, not a Tab", line_num);
-                exit(1);
-            }
         }
         
 
