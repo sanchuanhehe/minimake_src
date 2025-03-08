@@ -14,10 +14,10 @@ build_dir/temp/main.o: src/main.c include/loger.h build_dir/temp
 	gcc -c src/main.c -o build_dir/temp/main.o -I include -Wall
 
 build_dir:
-	mkdir build_dir
+	if [ ! -d build_dir ]; then mkdir build_dir; fi
 
 build_dir/temp: build_dir
-	mkdir build_dir/temp
+	if [ ! -d build_dir/temp ]; then mkdir build_dir/temp; fi
 
 clean:
 	rm -rf build_dir
