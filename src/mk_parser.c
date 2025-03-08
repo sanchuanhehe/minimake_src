@@ -67,16 +67,19 @@ int mk_parser(const char *arg)
             char *colon = strchr(line, ':');
             if (colon == NULL) {
                 log_error("Line:%d: Missing colon in target definition", line_num);
+                exit(1);
             }
         } else {
             log_debug("Command: %s", line);
             // 如果是命令行，那么前面必须有一个规则
             if (line_num == 1) {
                 log_error("Line1: Command found before rule");
+                exit(1);
             }
             // 如果行首不是4个空格,报错
             if (line[0] != ' ' || line[1] != ' ' || line[2] != ' ' || line[3] != ' ') {
                 log_error("Line:%d: Command must be indented with 4 spaces, not a Tab", line_num);
+                exit(1);
             }
         }
         
