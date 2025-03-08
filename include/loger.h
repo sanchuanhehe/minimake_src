@@ -7,21 +7,21 @@ typedef enum
     LOG_WARNING,
     LOG_INFO,
     LOG_DEBUG
-} log_level_t;
+} LogLevel_t;
 
 struct logger_config_t
 {
-    log_level_t level;
-    int use_color;
+    LogLevel_t level;
+    int useColor;
 };
 
 extern struct logger_config_t logger_config;
 
-void log_message(log_level_t level, const char *file, int line, const char *fmt, ...);
+void LogMessage(LogLevel_t level, const char *file, int line, const char *fmt, ...);
 
 // 封装宏简化调用
-#define log_debug(...) log_message(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
-#define log_info(...) log_message(LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
-#define log_warning(...) log_message(LOG_WARNING, __FILE__, __LINE__, __VA_ARGS__)
-#define log_error(...) log_message(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+#define LogDebug(...) LogMessage(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
+#define LogInfo(...) LogMessage(LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
+#define LogWarning(...) LogMessage(LOG_WARNING, __FILE__, __LINE__, __VA_ARGS__)
+#define LogError(...) LogMessage(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
 #endif

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "mk_parser.h"
 
 /**
  * @brief 解析Makefile文件
@@ -10,15 +11,17 @@
  * @param arg Makefile文件路径
  * @return int 
  */
-int mk_parser(const char *arg)
+int MkParser(const char *arg, MkTarget_p targets)
 {
-    log_debug("mk_parser");
-    log_debug("Parsing %s", arg);
+    targets = (MkTarget_p)malloc(sizeof(MkTarget_t) * 10);
+    int targetNum = 0;
+    LogDebug("mk_parser");
+    LogDebug("Parsing %s", arg);
     // 检查cwd下是否存在Makefile文件
     FILE *fp = fopen("Makefile", "r");
     if (fp == NULL)
     {
-        log_error("Makefile not found");
+        LogError("Makefile not found");
         return -1;
     }
     char line[1024];
@@ -29,7 +32,7 @@ int mk_parser(const char *arg)
     if (verbose_mode) {
         out_fp = fopen("Minimake_cleared.mk", "w");
         if (out_fp == NULL) {
-            log_error("Failed to create output file");
+            LogError("Failed to create output file");
             fclose(fp);
             return -1;
         }
@@ -63,25 +66,26 @@ int mk_parser(const char *arg)
         // 如果行首是不是制表符，那么这一行是一个新的规则
         if (line[0] != '\t')
         {
-            log_debug("Rule: %s", line);
+            LogDebug("Rule: %s", line);
             // 这一行是一个新的规则, 必须有冒号
             char *colon = strchr(line, ':');
             if (colon == NULL) {
-                log_error("Line:%d: Missing colon in target definition", line_num);
+                LogError("Line:%d: Missing colon in target definition", line_num);
                 exit(1);
             }
+            targetNum++;
         } else {
-            log_debug("Command: %s", line);
+            LogDebug("Command: %s", line);
             // 如果是命令行，那么前面必须有一个规则
             if (line_num == 1) {
-                log_error("Line1: Command found before rule");
+                LogError("Line1: Command found before rule");
                 exit(1);
             }
         }
         
 
         // 输出处理后的行
-        // log_debug("Processed line: %s", line);
+        // LogDebug("Processed line: %s", line);
         if (verbose_mode && out_fp != NULL) {
             fprintf(out_fp, "%s\n", line);
         }
@@ -92,5 +96,19 @@ int mk_parser(const char *arg)
     }
     fclose(fp);
 
+    return targetNum;
+}
+
+
+/**
+ * @brief free MkTarget_t
+ * 
+ */
+int MkFree(MkTarget_p target)
+{   
+    free(target->name);
+    free(target->deps);
+    free(target->commands);
+    free(target);
     return 0;
 }

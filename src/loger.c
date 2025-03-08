@@ -6,7 +6,7 @@
 // 全局日志配置
 struct logger_config_t logger_config = {LOG_INFO, 1}; // 默认级别为 INFO，启用颜色
 
-void log_message(log_level_t level, const char *file, int line, const char *fmt, ...)
+void LogMessage(LogLevel_t level, const char *file, int line, const char *fmt, ...)
 {
     if (level > logger_config.level)
         return;
@@ -42,9 +42,9 @@ void log_message(log_level_t level, const char *file, int line, const char *fmt,
 
     // 输出格式
     fprintf(stderr, "%s[%s][%s%s\x1b[0m][%s:%d] ",
-            logger_config.use_color ? "" : "",
+            logger_config.useColor ? "" : "",
             timestamp,
-            logger_config.use_color ? color : "",
+            logger_config.useColor ? color : "",
             level_str,
             file, line);
 

@@ -1,22 +1,41 @@
 #ifndef MK_PARSER_H
 #define MK_PARSER_H
 
+// Forward declaration
+typedef struct MkTarget *MkTarget_p;
+
 /**
  * @brief make 目标结构体
  */
-struct mk_target
+typedef struct MkTarget
 {
     char *name;       //< 目标名称
-    char **deps;   //< 依赖目标
+    // MkTarget_p *deps;   //< 依赖目标
+    char **deps;      //< 依赖目标
     char **commands; //< 执行命令
-};
+} MkTarget_t , *MkTarget_p;
 
 /**
  * @brief 解析Makefile文件
  * 
  * @param arg Makefile文件路径
- * @return int 
+ * @param targets 解析结果
+ * @param targetNum 解析结果数量
+ * @return int targetNum
+ * @note 解析成功返回解析结果数量，解析失败返回-1
+ * @note 解析结果需要在外部释放,targets需要free
  */
-int mk_parser(const char *arg);
+int MkParser(const char *arg, MkTarget_p targets);
 
+/**
+ * @brief free MkTarget_p
+ * 
+ */
+int MkFree(MkTarget_p target);
+
+/**
+ * @brief free MkTarget_t[]
+ * 
+ */
+int FreeMkTargets(MkTarget_p targets, int targetNum);
 #endif
