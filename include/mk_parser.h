@@ -12,7 +12,9 @@ typedef struct MkTarget
     char *name;       //< 目标名称
     // MkTarget_p *deps;   //< 依赖目标
     char **deps;      //< 依赖目标
+    int depsSize;     //< 依赖目标数量
     char **commands; //< 执行命令
+    int commandsSize; //< 执行命令数量
 } MkTarget_t , *MkTarget_p;
 
 /**

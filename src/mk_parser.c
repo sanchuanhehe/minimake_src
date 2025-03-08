@@ -7,13 +7,14 @@
 
 /**
  * @brief 解析Makefile文件
- * 
+ *
  * @param arg Makefile文件路径
- * @return int 
+ * @return int
  */
 int MkParser(const char *arg, MkTarget_p targets)
 {
-    targets = (MkTarget_p)malloc(sizeof(MkTarget_t) * 10);
+    int targetsSize = 10;
+    targets = (MkTarget_p)malloc(sizeof(MkTarget_t) * targetsSize);
     int targetNum = 0;
     LogDebug("mk_parser");
     LogDebug("Parsing %s", arg);
@@ -27,38 +28,44 @@ int MkParser(const char *arg, MkTarget_p targets)
     char line[1024];
     int verbose_mode = logger_config.level == LOG_DEBUG;
     FILE *out_fp = NULL;
-    
+
     // 如果是调试模式，打开输出文件
-    if (verbose_mode) {
+    if (verbose_mode)
+    {
         out_fp = fopen("Minimake_cleared.mk", "w");
-        if (out_fp == NULL) {
+        if (out_fp == NULL)
+        {
             LogError("Failed to create output file");
             fclose(fp);
             return -1;
         }
     }
 
-    int line_num = 0;
-
+    int lineNum = 0;
+    int commandsSize = 0;
     // 逐行读取文件
-    while (fgets(line, sizeof(line), fp) != NULL) {
-        line_num++;
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        lineNum++;
         int len;
-        
+
         // 去除注释
         char *comment = strchr(line, '#');
-        if (comment != NULL) {
+        if (comment != NULL)
+        {
             *comment = '\0';
         }
-        
+
         // 去除行尾空格和换行符
         len = strlen(line);
-        while (len > 0 && isspace(line[len-1])) {
+        while (len > 0 && isspace(line[len - 1]))
+        {
             line[--len] = '\0';
         }
-        
+
         // 跳过空行
-        if (len == 0) {
+        if (len == 0)
+        {
             continue;
         }
 
@@ -69,29 +76,87 @@ int MkParser(const char *arg, MkTarget_p targets)
             LogDebug("Rule: %s", line);
             // 这一行是一个新的规则, 必须有冒号
             char *colon = strchr(line, ':');
-            if (colon == NULL) {
-                LogError("Line:%d: Missing colon in target definition", line_num);
+            if (colon == NULL)
+            {
+                LogError("Line:%d: Missing colon in target definition", lineNum);
                 exit(1);
             }
             targetNum++;
-        } else {
+            if (targetNum > targetsSize)
+            {
+                targetsSize += 10;
+                targets = (MkTarget_p)realloc(targets, sizeof(MkTarget_t) * targetsSize);
+            }
+            targets[targetNum - 1].name = (char *)malloc(colon - line + 1);
+            strncpy(targets[targetNum - 1].name, line, colon - line);
+            targets[targetNum - 1].name[colon - line] = '\0';
+            LogDebug("Target: %s", targets[targetNum - 1].name);
+            // 依赖目标
+            // 跳过冒号后的空格
+            while (*colon != '\0' && isspace(*colon))
+            {
+                colon++;
+            }
+            char *space = colon; // 冒号后的第一个字符
+            // depsSize的初始最大值
+            int depsSize = 10;
+            targets[targetNum - 1].deps = (char **)malloc(sizeof(char *) * depsSize);
+            targets[targetNum - 1].depsSize = 0;
+            while (*space != '\0')
+            {
+                char *next_space = strchr(space, ' ');
+                if (next_space != NULL)
+                {
+                    *next_space = '\0';
+                }
+                if (targets[targetNum - 1].depsSize >= depsSize)
+                {
+                    depsSize += 10;
+                    targets[targetNum - 1].deps = (char **)realloc(targets[targetNum - 1].deps, sizeof(char *) * depsSize);
+                }
+                targets[targetNum - 1].deps[targets[targetNum - 1].depsSize] = (char *)malloc(strlen(space) + 1);
+                strcpy(targets[targetNum - 1].deps[targets[targetNum - 1].depsSize], space);
+                targets[targetNum - 1].deps[targets[targetNum - 1].depsSize][strlen(space)] = '\0';
+                targets[targetNum - 1].depsSize++;
+                LogDebug("Dep: %s", targets[targetNum - 1].deps[targets[targetNum - 1].depsSize - 1]);
+                if (next_space == NULL)
+                {
+                    break;
+                }
+                // 跳过多余的空格
+                while (*next_space != '\0' && isspace(*next_space))
+                {
+                    next_space++;
+                }
+                space = next_space;
+            }
+            // 初始化commandsSize
+            targets[targetNum - 1].commandsSize = 0;
+            commandsSize = 10;
+            targets[targetNum - 1].commands = (char **)malloc(sizeof(char *) * commandsSize);
+        }
+        else
+        {
             LogDebug("Command: %s", line);
             // 如果是命令行，那么前面必须有一个规则
-            if (line_num == 1) {
+            if (lineNum == 1)
+            {
                 LogError("Line1: Command found before rule");
                 exit(1);
             }
+            //TODO: commands
         }
-        
 
         // 输出处理后的行
         // LogDebug("Processed line: %s", line);
-        if (verbose_mode && out_fp != NULL) {
+        if (verbose_mode && out_fp != NULL)
+        {
             fprintf(out_fp, "%s\n", line);
         }
     }
 
-    if (out_fp != NULL) {
+    if (out_fp != NULL)
+    {
         fclose(out_fp);
     }
     fclose(fp);
@@ -99,16 +164,29 @@ int MkParser(const char *arg, MkTarget_p targets)
     return targetNum;
 }
 
-
 /**
  * @brief free MkTarget_t
- * 
+ *
  */
 int MkFree(MkTarget_p target)
-{   
+{
     free(target->name);
-    free(target->deps);
-    free(target->commands);
+    free(target->deps);//TODO: free deps
+    free(target->commands);//TODO: free commands
     free(target);
+    return 0;
+}
+
+/**
+ * @brief free MkTarget_p
+ *
+ */
+int FreeMkTargets(MkTarget_p targets, int targetNum)
+{
+    for (int i = 0; i < targetNum; i++)
+    {
+        MkFree(&targets[i]);
+    }
+    free(targets);
     return 0;
 }
