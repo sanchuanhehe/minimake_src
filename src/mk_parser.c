@@ -1,6 +1,8 @@
 #include "loger.h"
 #include <stdio.h>
 
+
+
 /**
  * @brief 解析Makefile文件
  * 
@@ -32,8 +34,11 @@ int mk_parser(const char *arg)
         }
     }
 
+    int line_num = 0;
+
     // 逐行读取文件
     while (fgets(line, sizeof(line), fp) != NULL) {
+        line_num++;
         char *p = line;
         int len;
         
@@ -53,18 +58,28 @@ int mk_parser(const char *arg)
         if (len == 0) {
             continue;
         }
+
+        // 进行静态语法检查
+        // 如果行首是不是空格或者制表符，那么这一行是一个新的规则
+        if (!isspace(*p)) {
+            log_debug("Rule: %s", line);
+            // 这一行是一个新的规则, 必须有冒号
+            char *colon = strchr(line, ':');
+            if (colon == NULL) {
+                log_error("Line:%d: Missing colon in target definition", line_num);
+            }
+        } else {
+            log_debug("Command: %s", line);
+            // 如果是命令行，那么前面必须有一个规则
+            if (line_num == 1) {
+                log_error("Line1: Command found before rule");
+            }
+            // 如果行首不是4个空格,报错
+            if (line[0] != ' ' || line[1] != ' ' || line[2] != ' ' || line[3] != ' ') {
+                log_error("Line:%d: Command must be indented with 4 spaces, not a Tab", line_num);
+            }
+        }
         
-        // // 检查是否全是空白字符
-        // int all_space = 1;
-        // for (int i = 0; i < len; i++) {
-        //     if (!isspace(line[i])) {
-        //         all_space = 0;
-        //         break;
-        //     }
-        // }
-        // if (all_space) {
-        //     continue;
-        // }
 
         // 输出处理后的行
         log_debug("Processed line: %s", line);
