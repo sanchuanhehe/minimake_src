@@ -16,7 +16,7 @@ build_dir/temp/main.o: src/main.c build_dir/temp
 build_dir/temp/mk_parser.o: src/mk_parser.c include/mk_parser.h build_dir/temp
 	gcc -c src/mk_parser.c -o build_dir/temp/mk_parser.o -I include -Wall
 
-build_dir:
+build_dir: # create build_dir if not exist
 	if [ ! -d build_dir ]; then mkdir build_dir; fi
 
 build_dir/temp: build_dir
