@@ -3,19 +3,19 @@
 
 // Forward declaration
 typedef struct MkTarget *MkTarget_p;
-
+typedef struct MkTarget MkTarget_t;
 /**
  * @brief make 目标结构体
  */
-typedef struct MkTarget
+struct MkTarget
 {
     char *name;       //< 目标名称
     MkTarget_p *deps_p; //< 依赖目标指针
     char **deps;      //< 依赖目标
-    int depsSize;     //< 依赖目标数量
     char **commands; //< 执行命令
+    int depsSize;     //< 依赖目标数量
     int commandsSize; //< 执行命令数量
-} MkTarget_t;
+};
 
 /**
  * @brief 解析Makefile文件
