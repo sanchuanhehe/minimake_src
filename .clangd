@@ -1,4 +1,2 @@
 CompileFlags:
-  Add: 
-    - "-I./include"
-    - "-Wall"
+  Add: ["-Iinclude"]
