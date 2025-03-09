@@ -171,9 +171,19 @@ int MkParser(const char *arg, MkTarget_p targets)
 int MkFree(MkTarget_p target)
 {
     free(target->name);
-    free(target->deps);//TODO: free deps
+    for(int i = 0; i < target->depsSize; i++)
+    {
+        free(target->deps[i]);
+        free(target->deps_p[i]);
+    }
+    free(target->deps);
+    for(int i = 0; i < target->commandsSize; i++)
+    {
+        free(target->commands[i]);
+    }
     free(target->commands);//TODO: free commands
     free(target);
+    target = NULL;
     return 0;
 }
 
@@ -188,5 +198,6 @@ int FreeMkTargets(MkTarget_p targets, int targetNum)
         MkFree(&targets[i]);
     }
     free(targets);
+    targets = NULL;
     return 0;
 }
