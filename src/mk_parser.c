@@ -201,3 +201,21 @@ int FreeMkTargets(MkTarget_p targets, int targetNum)
     targets = NULL;
     return 0;
 }
+
+/**
+ * @brief display MkTarget_t
+ * 
+ */
+int MkDisplay(MkTarget_p target)
+{
+    LogInfo("Target: %s", target->name);
+    for(int i = 0; i < target->depsSize; i++)
+    {
+        LogInfo("Dep%d: %s", i, target->deps[i]);
+    }
+    for(int i = 0; i < target->commandsSize; i++)
+    {
+        LogInfo("Command%d: %s", i, target->commands[i]);
+    }
+    return 0;
+}

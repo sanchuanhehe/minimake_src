@@ -40,4 +40,10 @@ int MkFree(MkTarget_p target);
  * 
  */
 int FreeMkTargets(MkTarget_p targets, int targetNum);
+
+/**
+ * @brief display MkTarget_t
+ * 
+ */
+int MkDisplay(MkTarget_p target);
 #endif
