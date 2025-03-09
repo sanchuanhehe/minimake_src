@@ -134,6 +134,7 @@ int MkParser(const char *arg, MkTarget_p targets)
             targets[targetNum - 1].commandsSize = 0;
             commandsSize = 10;
             targets[targetNum - 1].commands = (char **)malloc(sizeof(char *) * commandsSize);
+            MkDisplay(&targets[targetNum - 1]);
         }
         else
         {
@@ -145,6 +146,7 @@ int MkParser(const char *arg, MkTarget_p targets)
                 exit(1);
             }
             //TODO: commands
+            
         }
 
         // 输出处理后的行
