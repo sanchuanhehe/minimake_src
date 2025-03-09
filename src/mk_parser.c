@@ -135,6 +135,21 @@ int MkParser(const char *arg, MkTarget_p targets) {
         LogError("Line1: Command found before rule");
         exit(1);
       }
+      commandsSize++;
+      if (commandsSize > targets[targetNum - 1].commandsSize) {
+        commandsSize += 10;
+        targets[targetNum - 1].commands = (char **)realloc(
+            targets[targetNum - 1].commands, sizeof(char *) * commandsSize);
+      }
+      targets[targetNum - 1].commands[targets[targetNum - 1].commandsSize] =
+          (char *)malloc(len + 1);
+      strcpy(
+          targets[targetNum - 1].commands[targets[targetNum - 1].commandsSize],
+          line);
+      targets[targetNum - 1]
+          .commands[targets[targetNum - 1].commandsSize][len] = '\0';
+      targets[targetNum - 1].commandsSize++;
+      MkDisplay(&targets[targetNum - 1]);
       // TODO: commands
     }
 
