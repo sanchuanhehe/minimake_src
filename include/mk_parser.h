@@ -7,19 +7,18 @@ typedef struct MkTarget MkTarget_t;
 /**
  * @brief make 目标结构体
  */
-struct MkTarget
-{
-    char *name;       //< 目标名称
-    MkTarget_p *deps_p; //< 依赖目标指针
-    char **deps;      //< 依赖目标
-    char **commands; //< 执行命令
-    int depsSize;     //< 依赖目标数量
-    int commandsSize; //< 执行命令数量
+struct MkTarget {
+  char *name;          //< 目标名称
+  MkTarget_p *deps_p;  //< 依赖目标指针
+  char **deps;         //< 依赖目标
+  char **commands;     //< 执行命令
+  int depsSize;        //< 依赖目标数量
+  int commandsSize;    //< 执行命令数量
 };
 
 /**
  * @brief 解析Makefile文件
- * 
+ *
  * @param arg Makefile文件路径
  * @param targets 解析结果
  * @param targetNum 解析结果数量
@@ -31,19 +30,19 @@ int MkParser(const char *arg, MkTarget_p targets);
 
 /**
  * @brief free MkTarget_p
- * 
+ *
  */
 int MkFree(MkTarget_p target);
 
 /**
  * @brief free MkTarget_t[]
- * 
+ *
  */
 int FreeMkTargets(MkTarget_p targets, int targetNum);
 
 /**
  * @brief display MkTarget_t
- * 
+ *
  */
 int MkDisplay(MkTarget_p target);
 #endif
