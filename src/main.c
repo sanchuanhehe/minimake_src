@@ -52,7 +52,7 @@ static struct argp argp = {
     options, parse_opt, "[TARGET]...", "A minimake tool like make", 0, 0, 0};
 
 int main(int argc, char **argv) {
-  logger_config.level = LOG_DEBUG;
+  // logger_config.level = LOG_DEBUG;
   int targetNum = MkParser(&targets);
   LogDebug("targetNum: %d", targetNum);
   if (targetNum == -1) {
