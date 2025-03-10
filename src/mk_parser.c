@@ -76,18 +76,6 @@ int MkParser(MkTarget_p *targets) {
     return -1;
   }
   char line[1024];
-  int verbose_mode = logger_config.level == LOG_DEBUG;
-  FILE *out_fp = NULL;
-
-  // 如果是调试模式，打开输出文件
-  if (verbose_mode) {
-    out_fp = fopen("Minimake_cleared.mk", "w");
-    if (out_fp == NULL) {
-      LogError("Failed to create output file");
-      fclose(fp);
-      return -1;
-    }
-  }
 
   int lineNum = 0;
   int commandsSize = 0;
@@ -111,11 +99,6 @@ int MkParser(MkTarget_p *targets) {
     // 跳过空行
     if (len == 0) {
       continue;
-    }
-    // 输出处理后的行
-    // LogDebug("Processed line: %s", line);
-    if (verbose_mode && out_fp != NULL) {
-      fprintf(out_fp, "%s\n", line);
     }
 
     // 进行静态语法检查
@@ -240,17 +223,8 @@ int MkParser(MkTarget_p *targets) {
       // TODO: commands
     }
 
-    // // 输出处理后的行
-    // // LogDebug("Processed line: %s", line);
-    // if (verbose_mode && out_fp != NULL) {
-    //   fprintf(out_fp, "%s\n", line);
-    // }
-  }
 
-  if (out_fp != NULL) {
-    fclose(out_fp);
   }
-  fclose(fp);
 
   return targetNum;
 }
