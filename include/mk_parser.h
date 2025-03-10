@@ -19,14 +19,13 @@ struct MkTarget {
 /**
  * @brief 解析Makefile文件
  *
- * @param arg Makefile文件路径
  * @param targets 解析结果
  * @param targetNum 解析结果数量
  * @return int targetNum
  * @note 解析成功返回解析结果数量，解析失败返回-1
  * @note 解析结果需要在外部释放,targets需要free
  */
-int MkParser(const char *arg, MkTarget_p *targets);
+int MkParser(MkTarget_p *targets);
 
 /**
  * @brief free MkTarget_p

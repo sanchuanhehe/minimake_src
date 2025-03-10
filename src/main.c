@@ -16,6 +16,7 @@ static struct argp_option options[] = {
     {"verbose", 'v', 0, 0, "Enable verbose mode", 0},
     {"ersion", 'V', 0, 0, "Show version", 0},
     {0}};
+MkTarget_p targets = NULL;
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   // 实际参数处理逻辑
@@ -31,21 +32,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case ARGP_KEY_ARG:
       // LogInfo("Argument: %s", arg);
       LogDebug("Argument: %s", arg);
-      MkTarget_p targets = NULL;
-      int targetNum = MkParser(arg, &targets);
-      LogDebug("targetNum: %d", targetNum);
-      if (targetNum == -1) {
-        LogError("MkParser failed");
-        return -1;
-      } else if (targetNum == 0) {
-        LogError("No target found");
-        return -1;
-      }
-      // LogInfo("Parsed %d targets", targetNum);
-      // for (int i = 0; i < targetNum; i++) {
-      //   MkDisplay(&targets[i]);
-      // }
-      FreeMkTargets(&targets, targetNum);
+      
       break;
     case ARGP_KEY_END:
       if (state->arg_num < 1) argp_usage(state);
@@ -60,6 +47,17 @@ static struct argp argp = {
     options, parse_opt, "[TARGET]...", "A minimake tool like make", 0, 0, 0};
 
 int main(int argc, char **argv) {
+  logger_config.level = LOG_DEBUG;
+  int targetNum = MkParser(&targets);
+  LogDebug("targetNum: %d", targetNum);
+  if (targetNum == -1) {
+    LogError("MkParser failed");
+    return -1;
+  } else if (targetNum == 0) {
+    LogError("No target found");
+    return -1;
+  }
   argp_parse(&argp, argc, argv, 0, 0, 0);
+  FreeMkTargets(&targets, targetNum);
   return 0;
 }
