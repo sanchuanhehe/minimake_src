@@ -24,6 +24,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'v':
       LogInfo("verbose mode enabled");
       logger_config.level = LOG_DEBUG;  // 启用 DEBUG 级别日志
+      int err = MkClean();
+      if (err != 0) {
+        LogError("MkClean failed");
+        return err;
+      }
       LogDebug("Verbose mode activated");
       break;
     case 'V':

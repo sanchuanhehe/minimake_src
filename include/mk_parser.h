@@ -15,7 +15,12 @@ struct MkTarget {
   int depsSize;        //< 依赖目标数量
   int commandsSize;    //< 执行命令数量
 };
-
+/**
+ * @brief 清理makefile文件
+ * 
+ * @return int 
+ */
+int MkClean();
 /**
  * @brief 解析Makefile文件
  *

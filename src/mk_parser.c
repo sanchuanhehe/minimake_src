@@ -7,6 +7,57 @@
 
 #include "loger.h"
 
+int MkClean() {
+  if (logger_config.level < LOG_DEBUG) {
+    return 0;
+  }
+
+  FILE *fp = fopen("Makefile", "r");
+  if (fp == NULL) {
+    LogError("Makefile not found");
+    return -1;
+  }
+  char line[1024];
+
+  FILE *out_fp = NULL;
+
+  // 如果是调试模式，打开输出文件
+
+  out_fp = fopen("Minimake_cleared.mk", "w");
+  if (out_fp == NULL) {
+    LogError("Failed to create output file");
+    fclose(fp);
+    return -1;
+  }
+
+  // 逐行读取文件
+  while (fgets(line, sizeof(line), fp) != NULL) {
+    int len;
+
+    // 去除注释
+    char *comment = strchr(line, '#');
+    if (comment != NULL) {
+      *comment = '\0';
+    }
+
+    // 去除行尾空格和换行符
+    len = strlen(line);
+    while (len > 0 && isspace(line[len - 1])) {
+      line[--len] = '\0';
+    }
+
+    // 跳过空行
+    if (len == 0) {
+      continue;
+    }
+    // 输出处理后的行
+    // LogDebug("Processed line: %s", line);
+
+    fprintf(out_fp, "%s\n", line);
+  }
+  return 0;
+}
+
 /**
  * @brief 解析Makefile文件
  *
