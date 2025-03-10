@@ -26,7 +26,7 @@ struct MkTarget {
  * @note 解析成功返回解析结果数量，解析失败返回-1
  * @note 解析结果需要在外部释放,targets需要free
  */
-int MkParser(const char *arg, MkTarget_p targets);
+int MkParser(const char *arg, MkTarget_p *targets);
 
 /**
  * @brief free MkTarget_p
@@ -38,7 +38,7 @@ int MkFree(MkTarget_p target);
  * @brief free MkTarget_t[]
  *
  */
-int FreeMkTargets(MkTarget_p targets, int targetNum);
+int FreeMkTargets(MkTarget_p *targets, int targetNum);
 
 /**
  * @brief display MkTarget_t

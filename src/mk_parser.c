@@ -13,9 +13,9 @@
  * @param arg Makefile文件路径
  * @return int
  */
-int MkParser(const char *arg, MkTarget_p targets) {
+int MkParser(const char *arg, MkTarget_p *targets) {
   int targetsSize = 10;
-  targets = (MkTarget_p)malloc(sizeof(MkTarget_t) * targetsSize);
+  *targets = (MkTarget_p)malloc(sizeof(MkTarget_t) * targetsSize);
   int targetNum = 0;
   LogDebug("MkParser");
   LogDebug("Parsing %s", arg);
@@ -62,6 +62,11 @@ int MkParser(const char *arg, MkTarget_p targets) {
     if (len == 0) {
       continue;
     }
+    // 输出处理后的行
+    // LogDebug("Processed line: %s", line);
+    if (verbose_mode && out_fp != NULL) {
+      fprintf(out_fp, "%s\n", line);
+    }
 
     // 进行静态语法检查
     // 如果行首是不是制表符，那么这一行是一个新的规则
@@ -76,13 +81,24 @@ int MkParser(const char *arg, MkTarget_p targets) {
       targetNum++;
       if (targetNum > targetsSize) {
         targetsSize += 10;
-        targets =
-            (MkTarget_p)realloc(targets, sizeof(MkTarget_t) * targetsSize);
+        (*targets) =
+            (MkTarget_p)realloc((*targets), sizeof(MkTarget_t) * targetsSize);
       }
-      targets[targetNum - 1].name = (char *)malloc(colon - line + 1);
-      strncpy(targets[targetNum - 1].name, line, colon - line);
-      targets[targetNum - 1].name[colon - line] = '\0';
-      LogDebug("Target: %s", targets[targetNum - 1].name);
+      // 初始化目标为NULL
+      (*targets)[targetNum - 1].name = NULL;
+      (*targets)[targetNum - 1].deps = NULL;
+      (*targets)[targetNum - 1].commands = NULL;
+      (*targets)[targetNum - 1].deps_p = NULL;
+      (*targets)[targetNum - 1].depsSize = 0;
+      (*targets)[targetNum - 1].commandsSize = 0;
+      (*targets)[targetNum - 1].name = (char *)malloc(colon - line + 1);
+      // 打印目标名称地址
+      // LogDebug("Target %d: %p", targetNum - 1, (*targets)[targetNum - 1].name);
+      // LogDebug("Target: %s", (*targets)[targetNum - 1].name);
+      strncpy((*targets)[targetNum - 1].name, line, colon - line);
+      // LogDebug("Target: %s", (*targets)[targetNum - 1].name);
+      (*targets)[targetNum - 1].name[colon - line] = '\0';
+      LogDebug("Target: %s", (*targets)[targetNum - 1].name);
       // 依赖目标
       // 跳过冒号后的空格
       while (*colon != '\0' && isspace(*colon)) {
@@ -91,28 +107,29 @@ int MkParser(const char *arg, MkTarget_p targets) {
       char *space = colon;  // 冒号后的第一个字符
       // depsSize的初始最大值
       int depsSize = 10;
-      targets[targetNum - 1].deps = (char **)malloc(sizeof(char *) * depsSize);
-      targets[targetNum - 1].depsSize = 0;
+      (*targets)[targetNum - 1].deps =
+          (char **)malloc(sizeof(char *) * depsSize);
+      (*targets)[targetNum - 1].depsSize = 0;
       while (*space != '\0') {
         char *next_space = strchr(space, ' ');
         if (next_space != NULL) {
           *next_space = '\0';
         }
-        if (targets[targetNum - 1].depsSize >= depsSize) {
+        if ((*targets)[targetNum - 1].depsSize >= depsSize) {
           depsSize += 10;
-          targets[targetNum - 1].deps = (char **)realloc(
-              targets[targetNum - 1].deps, sizeof(char *) * depsSize);
+          (*targets)[targetNum - 1].deps = (char **)realloc(
+              (*targets)[targetNum - 1].deps, sizeof(char *) * depsSize);
         }
-        targets[targetNum - 1].deps[targets[targetNum - 1].depsSize] =
+        (*targets)[targetNum - 1].deps[(*targets)[targetNum - 1].depsSize] =
             (char *)malloc(strlen(space) + 1);
-        strcpy(targets[targetNum - 1].deps[targets[targetNum - 1].depsSize],
-               space);
-        targets[targetNum - 1]
-            .deps[targets[targetNum - 1].depsSize][strlen(space)] = '\0';
-        targets[targetNum - 1].depsSize++;
-        LogDebug(
-            "Dep: %s",
-            targets[targetNum - 1].deps[targets[targetNum - 1].depsSize - 1]);
+        strcpy(
+            (*targets)[targetNum - 1].deps[(*targets)[targetNum - 1].depsSize],
+            space);
+        (*targets)[targetNum - 1]
+            .deps[(*targets)[targetNum - 1].depsSize][strlen(space)] = '\0';
+        (*targets)[targetNum - 1].depsSize++;
+        LogDebug("Dep: %s", (*targets)[targetNum - 1]
+                                .deps[(*targets)[targetNum - 1].depsSize - 1]);
         if (next_space == NULL) {
           break;
         }
@@ -123,11 +140,10 @@ int MkParser(const char *arg, MkTarget_p targets) {
         space = next_space;
       }
       // 初始化commandsSize
-      targets[targetNum - 1].commandsSize = 0;
       commandsSize = 10;
-      targets[targetNum - 1].commands =
+      (*targets)[targetNum - 1].commands =
           (char **)malloc(sizeof(char *) * commandsSize);
-      MkDisplay(&targets[targetNum - 1]);
+      MkDisplay(&(*targets)[targetNum - 1]);
     } else {
       LogDebug("Command: %s", line);
       // 如果是命令行，那么前面必须有一个规则
@@ -136,28 +152,29 @@ int MkParser(const char *arg, MkTarget_p targets) {
         exit(1);
       }
       commandsSize++;
-      if (commandsSize > targets[targetNum - 1].commandsSize) {
+      if (commandsSize > (*targets)[targetNum - 1].commandsSize) {
         commandsSize += 10;
-        targets[targetNum - 1].commands = (char **)realloc(
-            targets[targetNum - 1].commands, sizeof(char *) * commandsSize);
+        (*targets)[targetNum - 1].commands = (char **)realloc(
+            (*targets)[targetNum - 1].commands, sizeof(char *) * commandsSize);
       }
-      targets[targetNum - 1].commands[targets[targetNum - 1].commandsSize] =
+      (*targets)[targetNum - 1]
+          .commands[(*targets)[targetNum - 1].commandsSize] =
           (char *)malloc(len + 1);
-      strcpy(
-          targets[targetNum - 1].commands[targets[targetNum - 1].commandsSize],
-          line);
-      targets[targetNum - 1]
-          .commands[targets[targetNum - 1].commandsSize][len] = '\0';
-      targets[targetNum - 1].commandsSize++;
-      MkDisplay(&targets[targetNum - 1]);
+      strcpy((*targets)[targetNum - 1]
+                 .commands[(*targets)[targetNum - 1].commandsSize],
+             line);
+      (*targets)[targetNum - 1]
+          .commands[(*targets)[targetNum - 1].commandsSize][len] = '\0';
+      (*targets)[targetNum - 1].commandsSize++;
+      MkDisplay(&(*targets)[targetNum - 1]);
       // TODO: commands
     }
 
-    // 输出处理后的行
-    // LogDebug("Processed line: %s", line);
-    if (verbose_mode && out_fp != NULL) {
-      fprintf(out_fp, "%s\n", line);
-    }
+    // // 输出处理后的行
+    // // LogDebug("Processed line: %s", line);
+    // if (verbose_mode && out_fp != NULL) {
+    //   fprintf(out_fp, "%s\n", line);
+    // }
   }
 
   if (out_fp != NULL) {
@@ -173,31 +190,41 @@ int MkParser(const char *arg, MkTarget_p targets) {
  *
  */
 int MkFree(MkTarget_p target) {
+  LogDebug("MkFree");
+  if (target == NULL) {
+    LogError("target is NULL");
+    return -1;
+  }
   free(target->name);
   for (int i = 0; i < target->depsSize; i++) {
     free(target->deps[i]);
-    free(target->deps_p[i]);
+    // free(target->deps_p[i]);
   }
   free(target->deps);
   for (int i = 0; i < target->commandsSize; i++) {
     free(target->commands[i]);
   }
   free(target->commands);  // TODO: free commands
-  free(target);
   target = NULL;
   return 0;
 }
 
 /**
- * @brief free MkTarget_p
+ * @brief free MkTarget_t[]
  *
  */
-int FreeMkTargets(MkTarget_p targets, int targetNum) {
+int FreeMkTargets(MkTarget_p *targets, int targetNum) {
+  LogDebug("FreeMkTargets");
   for (int i = 0; i < targetNum; i++) {
-    MkFree(&targets[i]);
+    // LogDebug("Target %d: %p", i, (*targets)[i].name);
+    if ((*targets)[i].name == NULL) {
+      LogError("targets[%d] is NULL", i);
+      break;
+    }
+    MkFree(((*targets)+i));
   }
-  free(targets);
-  targets = NULL;
+  free((*targets));
+  (*targets) = NULL;
   return 0;
 }
 
@@ -207,11 +234,13 @@ int FreeMkTargets(MkTarget_p targets, int targetNum) {
  */
 int MkDisplay(MkTarget_p target) {
   LogInfo("Target: %s", target->name);
+  LogInfo("DepSize: %d", target->depsSize);
   for (int i = 0; i < target->depsSize; i++) {
     LogInfo("Dep%d: %s", i, target->deps[i]);
   }
+  LogInfo("CommandSize: %d", target->commandsSize);
   for (int i = 0; i < target->commandsSize; i++) {
-    LogInfo("Command%d: %s", i, target->commands[i]);
+    LogInfo("Command%d: %s", i, target->commands[i]);  // TODO: display commands
   }
   return 0;
 }

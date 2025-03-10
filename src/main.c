@@ -32,7 +32,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
       // LogInfo("Argument: %s", arg);
       LogDebug("Argument: %s", arg);
       MkTarget_p targets = NULL;
-      int targetNum = MkParser(arg, targets);
+      int targetNum = MkParser(arg, &targets);
       LogDebug("targetNum: %d", targetNum);
       if (targetNum == -1) {
         LogError("MkParser failed");
@@ -41,7 +41,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         LogError("No target found");
         return -1;
       }
-      FreeMkTargets(targets, targetNum);
+      // LogInfo("Parsed %d targets", targetNum);
+      // for (int i = 0; i < targetNum; i++) {
+      //   MkDisplay(&targets[i]);
+      // }
+      FreeMkTargets(&targets, targetNum);
       break;
     case ARGP_KEY_END:
       if (state->arg_num < 1) argp_usage(state);
