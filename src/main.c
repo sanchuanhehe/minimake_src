@@ -11,7 +11,7 @@
 
 #include "loger.h"
 #include "mk_parser.h"
-
+#include "mk_runner.h"
 static struct argp_option options[] = {
     {"verbose", 'v', 0, 0, "Enable verbose mode", 0},
     {"ersion", 'V', 0, 0, "Show version", 0},
@@ -37,6 +37,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case ARGP_KEY_ARG:
       // LogInfo("Argument: %s", arg);
       LogDebug("Argument: %s", arg);
+      int ret = MkRun(&targets[0]);
+      if (ret != 0) {
+        LogError("MkRun failed");
+        return ret;
+      }
       break;
     case ARGP_KEY_END:
       if (state->arg_num < 1) argp_usage(state);

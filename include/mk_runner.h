@@ -6,9 +6,9 @@
 #include "loger.h"
 
 /**
- * @brief 
+ * @brief try to run the target
  * 
  */
-
+int MkRun(MkTarget_p target);
 
 #endif

@@ -216,8 +216,8 @@ int MkParser(MkTarget_p *targets) {
       // MkDisplay(&(*targets)[targetNum - 1]);
       // TODO: commands
     }
-    LogDebug("Processed line: %s", line);
-    MkDisplay(&(*targets)[targetNum - 1]);
+    // LogDebug("Processed line: %s", line);
+    // MkDisplay(&(*targets)[targetNum - 1]);
   }
 
   return targetNum;
