@@ -68,4 +68,6 @@ int MkDepCheck(MkTarget_p *targets, int targetNum);
  * @note Check if the targets' target are repeated
  */
 int MkTargetCheck(MkTarget_p *targets, int targetNum);
+
+
 #endif

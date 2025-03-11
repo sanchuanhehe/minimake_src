@@ -339,3 +339,4 @@ int MkTargetCheck(MkTarget_p *targets, int targetNum) {
   }
   return ret;
 }
+
