@@ -37,7 +37,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case ARGP_KEY_ARG:
       // LogInfo("Argument: %s", arg);
       LogDebug("Argument: %s", arg);
-      
       break;
     case ARGP_KEY_END:
       if (state->arg_num < 1) argp_usage(state);
@@ -62,6 +61,8 @@ int main(int argc, char **argv) {
     LogError("No target found");
     return -1;
   }
+  MkDepCheck(&targets, targetNum);
+  MkTargetCheck(&targets, targetNum);
   argp_parse(&argp, argc, argv, 0, 0, 0);
   FreeMkTargets(&targets, targetNum);
   return 0;

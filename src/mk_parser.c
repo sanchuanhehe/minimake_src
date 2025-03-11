@@ -153,7 +153,9 @@ int MkParser(MkTarget_p *targets) {
       (*targets)[targetNum - 1].depsSize = 0;
       while (*space != '\0') {
         char *next_space = strchr(space, ' ');
-        // LogDebug("Next_space: %s", next_space);
+        if (next_space == NULL) {
+          next_space = space + strlen(space);
+        }
         if ((*targets)[targetNum - 1].depsSize >= depsSize) {
           depsSize += 10;
           (*targets)[targetNum - 1].deps = (char **)realloc(
@@ -164,29 +166,21 @@ int MkParser(MkTarget_p *targets) {
           }
         }
         (*targets)[targetNum - 1].deps[(*targets)[targetNum - 1].depsSize] =
-            (char *)malloc(strlen(space) + 1);
-        strcpy(
+            (char *)malloc(next_space - space + 1);
+        strncpy(
             (*targets)[targetNum - 1].deps[(*targets)[targetNum - 1].depsSize],
-            space);
+            space, next_space - space);
         (*targets)[targetNum - 1]
-            .deps[(*targets)[targetNum - 1].depsSize][strlen(space)] = '\0';
+            .deps[(*targets)[targetNum - 1].depsSize][next_space - space] =
+            '\0';
         (*targets)[targetNum - 1].depsSize++;
-        // LogDebug("Dep: %s", (*targets)[targetNum - 1]
-        //                         .deps[(*targets)[targetNum - 1].depsSize -
-        //                         1]);
-        if (next_space != NULL && *next_space != '\0') {
-          *next_space = '\0';
-        } else {
+        if (*next_space == '\0') {
           break;
         }
-        next_space++;
-        // LogDebug("Next_space1: %s", next_space);
-        // 跳过多余的空格
-        while (*next_space != '\0' && isspace(*next_space)) {
-          next_space++;
+        space = next_space + 1;
+        while (*space != '\0' && isspace(*space)) {
+          space++;
         }
-        // LogDebug("Next_space2: %s", next_space);
-        space = next_space;
       }
       // 初始化commandsSize
       commandsSize = 10;
@@ -222,13 +216,12 @@ int MkParser(MkTarget_p *targets) {
       // MkDisplay(&(*targets)[targetNum - 1]);
       // TODO: commands
     }
-
-
+    LogDebug("Processed line: %s", line);
+    MkDisplay(&(*targets)[targetNum - 1]);
   }
 
   return targetNum;
 }
-
 /**
  * @brief free MkTarget_t
  *
@@ -292,4 +285,57 @@ int MkDisplay(MkTarget_p target) {
             target->commands[i]);  // TODO: display commands
   }
   return 0;
+}
+
+/**
+ * @brief Check MKTarget_p*
+ * @param targets
+ * @param targetNum
+ * @return int
+ * @note Check if the targets' deps are valid
+ */
+int MkDepCheck(MkTarget_p *targets, int targetNum) {
+  LogDebug("MkCheck");
+  int ret = 0;
+  for (int i = 0; i < targetNum; i++) {
+    for (int j = 0; j < (*targets)[i].depsSize; j++) {
+      int found = 0;
+      for (int k = 0; k < targetNum; k++) {
+        if (strcmp((*targets)[i].deps[j], (*targets)[k].name) == 0) {
+          found = 1;
+          break;
+        }
+      }
+      if (found == 0) {
+        // 检查依赖目标文件是否存在
+        FILE *fp = fopen((*targets)[i].deps[j], "r");
+        if (fp == NULL) {
+          LogError("Invalid dependency '%s'", (*targets)[i].deps[j]);
+          ret = -1;
+        }
+      }
+    }
+  }
+  return ret;
+}
+
+/**
+ * @brief Check MKTarget_p*
+ * @param targets
+ * @param targetNum
+ * @return int
+ * @note Check if the targets' target are repeated
+ */
+int MkTargetCheck(MkTarget_p *targets, int targetNum) {
+  LogDebug("MkCheck");
+  int ret = 0;
+  for (int i = 0; i < targetNum; i++) {
+    for (int j = i + 1; j < targetNum; j++) {
+      if (strcmp((*targets)[i].name, (*targets)[j].name) == 0) {
+        LogError("Duplicate target definition '%s'", (*targets)[i].name);
+        ret = -1;
+      }
+    }
+  }
+  return ret;
 }

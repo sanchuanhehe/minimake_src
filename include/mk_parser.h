@@ -17,8 +17,8 @@ struct MkTarget {
 };
 /**
  * @brief 清理makefile文件
- * 
- * @return int 
+ *
+ * @return int
  */
 int MkClean();
 /**
@@ -49,4 +49,23 @@ int FreeMkTargets(MkTarget_p *targets, int targetNum);
  *
  */
 int MkDisplay(MkTarget_p target);
+
+/**
+ * @brief Check MKTarget_p*
+ * @param targets
+ * @param targetNum
+ * @return int
+ * @note Check if the targets' deps are valid
+ */
+
+int MkDepCheck(MkTarget_p *targets, int targetNum);
+
+/**
+ * @brief Check MKTarget_p*
+ * @param targets
+ * @param targetNum
+ * @return int
+ * @note Check if the targets' target are repeated
+ */
+int MkTargetCheck(MkTarget_p *targets, int targetNum);
 #endif
