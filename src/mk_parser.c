@@ -255,7 +255,7 @@ int FreeMkTargets(MkTarget_p *targets, int targetNum) {
   LogDebug("FreeMkTargets");
   for (int i = 0; i < targetNum; i++) {
     if (logger_config.level == LOG_DEBUG) {
-      MkDisplay((*targets) + i);
+      // MkDisplay((*targets) + i);
     }
     // LogDebug("Target %d: %p", i, (*targets)[i].name);
     if ((*targets)[i].name == NULL) {
@@ -352,8 +352,8 @@ int MkTargetCheck(MkTarget_p *targets, int targetNum) {
  */
 int MkGraphInit(igraph_t *graph, MkTarget_p *targets, int targetNum) {
   LogDebug("MkGraphInit");
-  igraph_vector_t edges;
-  igraph_vector_init(&edges, 0);
+  igraph_vector_int_t edges;
+  igraph_vector_int_init(&edges, 0);
 
   // 添加顶点
   igraph_empty(graph, targetNum, IGRAPH_DIRECTED);
@@ -363,8 +363,9 @@ int MkGraphInit(igraph_t *graph, MkTarget_p *targets, int targetNum) {
     for (int j = 0; j < (*targets)[i].depsSize; j++) {
       for (int k = 0; k < targetNum; k++) {
         if (strcmp((*targets)[i].deps[j], (*targets)[k].name) == 0) {
-          igraph_vector_push_back(&edges, i);
-          igraph_vector_push_back(&edges, k);
+          // igraph_vector_int_push_back(&edges, k);
+          igraph_vector_int_push_back(&edges, i);
+          igraph_vector_int_push_back(&edges, k);
           break;
         }
       }
@@ -372,7 +373,56 @@ int MkGraphInit(igraph_t *graph, MkTarget_p *targets, int targetNum) {
   }
 
   igraph_add_edges(graph, &edges, 0);
-  igraph_vector_destroy(&edges);
+  igraph_vector_int_destroy(&edges);
+  // MkGraphDisplay(graph, targets, targetNum);
+  return 0;
+}
 
+/**
+ * @brief Display MkGraph
+ *
+ * @param graph
+ * @return int
+ * @note Display graph
+ */
+int MkGraphDisplay(igraph_t *graph, MkTarget_p *targets, int targetNum) {
+  if (logger_config.level < LOG_DEBUG) {
+    return 0;
+  }
+  LogDebug("MkGraphDisplay");
+  igraph_integer_t n;
+  igraph_vector_int_t v;
+  igraph_vector_int_init(&v, 0);
+  igraph_vs_t vs;
+  igraph_vs_all(&vs);
+  n = igraph_vcount(graph);
+  igraph_vector_int_resize(&v, n);
+  igraph_vector_int_fill(&v, 0);
+  igraph_get_edgelist(graph, &v, 0);
+  for (int i = 0; i < igraph_vector_int_size(&v); i += 2) {
+    LogDebug("%d -> %d", VECTOR(v)[i], VECTOR(v)[i + 1]);
+    LogDebug("%s -> %s", (*targets)[VECTOR(v)[i]].name,
+             (*targets)[VECTOR(v)[i + 1]].name);
+  }
+  igraph_vector_int_destroy(&v);
+  igraph_vs_destroy(&vs);
+  return 0;
+}
+
+/**
+ * @brief topological sort
+ *
+ * @param graph
+ * @param order
+ * @return int
+ * @note topological sort
+ */
+int MkGraphTopologicalSort(igraph_t *graph, igraph_vector_int_t *order) {
+  LogDebug("MkGraphTopologicalSort");
+  igraph_vector_int_t v;
+  igraph_vector_int_init(&v, 0);
+  igraph_topological_sorting(graph, &v, IGRAPH_IN);
+  igraph_vector_int_update(order, &v);
+  igraph_vector_int_destroy(&v);
   return 0;
 }

@@ -4,6 +4,7 @@
   "editor.detectIndentation": false,
   "files.associations": {
     "numbers": "cpp",
-    "*.pmt": "c"
+    "*.pmt": "c",
+    "random": "cpp"
   }
 }

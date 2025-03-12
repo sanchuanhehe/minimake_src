@@ -17,7 +17,8 @@ static struct argp_option options[] = {
     {"ersion", 'V', 0, 0, "Show version", 0},
     {0}};
 MkTarget_p targets = NULL;
-
+igraph_t graph;
+int targetNum = 0;
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   // 实际参数处理逻辑
   switch (key) {
@@ -37,9 +38,15 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case ARGP_KEY_ARG:
       // LogInfo("Argument: %s", arg);
       LogDebug("Argument: %s", arg);
-      int ret = MkRun(&targets[0]);
+      // int ret = MkRun(&targets[0]);
+      // if (ret != 0) {
+      //   LogError("MkRun failed");
+      //   return ret;
+      // }
+      int ret = MkRunFrom(targets, targetNum, arg, &graph);
       if (ret != 0) {
-        LogError("MkRun failed");
+        LogError("ret: %d", ret);
+        LogError("arg MkRunFrom failed: %s", arg);
         return ret;
       }
       break;
@@ -57,7 +64,7 @@ static struct argp argp = {
 
 int main(int argc, char **argv) {
   // logger_config.level = LOG_DEBUG;
-  int targetNum = MkParser(&targets);
+  targetNum = MkParser(&targets);
   LogDebug("targetNum: %d", targetNum);
   if (targetNum == -1) {
     LogError("MkParser failed");
@@ -68,6 +75,12 @@ int main(int argc, char **argv) {
   }
   MkDepCheck(&targets, targetNum);
   MkTargetCheck(&targets, targetNum);
+
+  int ret = MkGraphInit(&graph, &targets, targetNum);
+  if (ret != 0) {
+    LogError("MkGraphInit failed");
+    return -1;
+  }
   argp_parse(&argp, argc, argv, 0, 0, 0);
   FreeMkTargets(&targets, targetNum);
   return 0;

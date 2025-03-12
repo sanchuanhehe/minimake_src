@@ -15,7 +15,7 @@ struct MkTarget {
   int depsSize;        //< 依赖目标数量
   int commandsSize;    //< 执行命令数量
   igraph_integer_t vid;  //< 顶点id
-  igraph_vector_t *vdeps;  //< 依赖顶点
+  igraph_vector_int_t *vdeps;  //< 依赖顶点
 };
 /**
  * @brief 清理makefile文件
@@ -81,4 +81,23 @@ int MkTargetCheck(MkTarget_p *targets, int targetNum);
  * @note init graph with targets and fiind every target's deps (vdeps)
  */
 int MkGraphInit(igraph_t *graph, MkTarget_p *targets, int targetNum);
+
+/**
+ * @brief Display MkGraph
+ * 
+ * @param graph
+ * @return int
+ * @note Display graph
+ */
+int MkGraphDisplay(igraph_t *graph, MkTarget_p *targets, int targetNum);
+
+/**
+ * @brief topological sort
+ * 
+ * @param graph
+ * @param order
+ * @return int
+ * @note topological sort
+ */
+int MkGraphTopologicalSort(igraph_t *graph, igraph_vector_int_t *order);
 #endif

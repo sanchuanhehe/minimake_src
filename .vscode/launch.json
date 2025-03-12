@@ -10,7 +10,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/minimake",
       "args": [
-        "build",
+        // "build",
         "-v",
       ],
       "stopAtEntry": false,
