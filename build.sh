@@ -8,4 +8,4 @@ cp ./build_dir/minimake .
 ./minimake -v build
 
 echo "Cleaning up"
-rm minimake
+# rm minimake
