@@ -123,12 +123,13 @@ int MkParser(MkTarget_p *targets) {
       }
       // 初始化目标为NULL
       (*targets)[targetNum - 1].name = NULL;
-      (*targets)[targetNum - 1].deps = NULL;
+      // (*targets)[targetNum - 1].deps = NULL;
       (*targets)[targetNum - 1].commands = NULL;
-      (*targets)[targetNum - 1].deps_p = NULL;
+      // (*targets)[targetNum - 1].deps_p = NULL;
       (*targets)[targetNum - 1].depsSize = 0;
       (*targets)[targetNum - 1].commandsSize = 0;
       (*targets)[targetNum - 1].name = (char *)malloc(colon - line + 1);
+      (*targets)[targetNum - 1].vid = targetNum - 1;
       // 打印目标名称地址
       // LogDebug("Target %d: %p", targetNum - 1, (*targets)[targetNum -
       // 1].name); LogDebug("Target: %s", (*targets)[targetNum - 1].name);
@@ -340,3 +341,38 @@ int MkTargetCheck(MkTarget_p *targets, int targetNum) {
   return ret;
 }
 
+/**
+ * @brief init MkGraph
+ *
+ * @param graph
+ * @param targets
+ * @param targetNum
+ * @return int
+ * @note init graph with targets and fiind every target's deps (vdeps)
+ */
+int MkGraphInit(igraph_t *graph, MkTarget_p *targets, int targetNum) {
+  LogDebug("MkGraphInit");
+  igraph_vector_t edges;
+  igraph_vector_init(&edges, 0);
+
+  // 添加顶点
+  igraph_empty(graph, targetNum, IGRAPH_DIRECTED);
+
+  // 添加边
+  for (int i = 0; i < targetNum; i++) {
+    for (int j = 0; j < (*targets)[i].depsSize; j++) {
+      for (int k = 0; k < targetNum; k++) {
+        if (strcmp((*targets)[i].deps[j], (*targets)[k].name) == 0) {
+          igraph_vector_push_back(&edges, i);
+          igraph_vector_push_back(&edges, k);
+          break;
+        }
+      }
+    }
+  }
+
+  igraph_add_edges(graph, &edges, 0);
+  igraph_vector_destroy(&edges);
+
+  return 0;
+}

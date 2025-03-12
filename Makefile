@@ -6,7 +6,7 @@ build: build_dir/minimake
 	echo "Build minimake success"
 
 build_dir/minimake: build_dir/temp/main.o build_dir/temp/loger.o build_dir/temp build_dir/temp/mk_parser.o build_dir/temp/mk_runner.o
-	gcc -o build_dir/minimake src/main.c build_dir/temp/loger.o build_dir/temp/mk_parser.o build_dir/temp/mk_runner.o -I include -Wall -g
+	gcc -o build_dir/minimake src/main.c build_dir/temp/loger.o build_dir/temp/mk_parser.o build_dir/temp/mk_runner.o -I include -Wall -g /usr/local/lib/libigraph.a -lm
 build_dir/temp/loger.o: src/loger.c include/loger.h build_dir/temp
 	gcc -c src/loger.c -o build_dir/temp/loger.o -I include -Wall -g
 

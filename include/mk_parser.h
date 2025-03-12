@@ -1,6 +1,6 @@
 #ifndef MK_PARSER_H
 #define MK_PARSER_H
-
+#include "igraph/igraph.h"
 // Forward declaration
 typedef struct MkTarget *MkTarget_p;
 typedef struct MkTarget MkTarget_t;
@@ -9,11 +9,13 @@ typedef struct MkTarget MkTarget_t;
  */
 struct MkTarget {
   char *name;          //< 目标名称
-  MkTarget_p *deps_p;  //< 依赖目标指针
+  // MkTarget_p *deps_p;  //< 依赖目标指针
   char **deps;         //< 依赖目标
   char **commands;     //< 执行命令
   int depsSize;        //< 依赖目标数量
   int commandsSize;    //< 执行命令数量
+  igraph_integer_t vid;  //< 顶点id
+  igraph_vector_t *vdeps;  //< 依赖顶点
 };
 /**
  * @brief 清理makefile文件
@@ -69,5 +71,14 @@ int MkDepCheck(MkTarget_p *targets, int targetNum);
  */
 int MkTargetCheck(MkTarget_p *targets, int targetNum);
 
-
+/**
+ * @brief init MkGraph
+ * 
+ * @param graph
+ * @param targets
+ * @param targetNum
+ * @return int
+ * @note init graph with targets and fiind every target's deps (vdeps)
+ */
+int MkGraphInit(igraph_t *graph, MkTarget_p *targets, int targetNum);
 #endif
