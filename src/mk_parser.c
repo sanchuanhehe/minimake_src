@@ -108,7 +108,7 @@ int MkParser(MkTarget_p *targets) {
       // 这一行是一个新的规则, 必须有冒号
       char *colon = strchr(line, ':');
       if (colon == NULL) {
-        LogError("Line:%d: Missing colon in target definition", lineNum);
+        LogError("Line%d: Missing colon in target definition", lineNum);
         exit(1);
       }
       targetNum++;

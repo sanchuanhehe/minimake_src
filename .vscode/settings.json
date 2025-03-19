@@ -6,5 +6,6 @@
     "numbers": "cpp",
     "*.pmt": "c",
     "random": "cpp"
-  }
+  },
+  "cmake.sourceDirectory": "/home/sanchuan/Codes/C/minimake_src/third_party/igraph/src/centrality/prpack"
 }
